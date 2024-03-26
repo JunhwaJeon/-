@@ -31,7 +31,7 @@ for mod_case=1:3
     %% 8-PSK case
     elseif mod_case==2
         % 8-PSK Constellation
-        x(1)=(1+1j)/sqrt(2); x(5)=(-1-1j)/sqrt(2); x(3)=conj(x(5)); x(7)=conj(x(1)); 
+        x(1)=(1+1j)/sqrt(2); x(5)=(-1-1j)/sqrt(2); x(3)=conj(x(5)); x(7)=conj(x(1));
         x(2)=1j; x(4)=-1; x(6)=-1j; x(8)=1;
 
         for j=1:length(P)

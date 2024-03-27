@@ -1,24 +1,37 @@
-close all; clear all; clc
-%% BLER을 구하고, BLER 이용해 Throughput구하기
-
+%% 각 파워당 BLER을 구하고, BLER 이용해 Throughput 정보 반환
+function Throughput=BLER(block_length, mod_type, channel_type)
 % Parameters
-b_len=10;
 iter=10^5;
-m_type=['BPSK', 'QPSK', '8-PSK', '16-QAM'];
-c_type=['AWGN','Rayleigh'];
-throughput=0;
-Blk_err=0;
+P_db=0:2:20;
+P=10.^(P_db./10);
+Block_error=linspace(0,0,length(P));
+Throughput=linspace(0,0,length(P));
+switch mod_type
+    case {'BPSK', 'bpsk'}
+        mod_order=1;
+    case {'QPSK','qpsk'}
+        mod_order=2;
+    case {'8-PSK','8PSK','8psk','8-psk'}
+        mod_order=3;
+    case {'16-QAM','16QAM','16-qam','16qam'}
+        mod_order=4;
+end
 
-for chan=1:length(c_type)
-for mod=1:length(m_type)
-    mod_order=mod;
-    for i=1:iter
-        Block=Block_gen(m_type(mod),b_len);
-        Block_r=zeros(size(Block));
-        for j=1:b_len
-            Block_r(j,:)=Transmit(Block(j),c_type(chan));
+for l=1:length(P)
+    BER=0; % 모든 시뮬레이션 후의 비트 에러 개수
+    BLER_=0;
+for i=1:iter % Monte-Carlo simulation
+    Block=Block_gen(mod_type,block_length);
+    for j=1:block_length % Block 내의 각각 symbol에 대해
+        sym_temp=Transmit(Block(j,1),channel_type,P(l));
+        [y,y_code]=Demodul(sym_temp,mod_type);
+        if Block(j,1)~=y
+            BLE=BLER_+1;
+            break
         end
-        
     end
+end
+    Block_error(l)=BER/(iter*mod_order*block_length);
+    Throughput(l)=(mod_order*block_length)-(BER/iter);
 end
 end

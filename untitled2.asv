@@ -1,0 +1,20 @@
+close all; clear; clc;
+
+P_db=0:2:20;
+
+% AWGN Plotting
+semilogy(P_db,BLER(20,'BPSK','AWGN'),'r-','o'); grid on; hold on;
+semilogy(P_db,BLER(20,'QPSK','AWGN'),'g-','o');
+semilogy(P_db,BLER(20,'8-PSK','AWGN'),'b-','o');
+semilogy(P_db,BLER(20,'16-QAM','AWGN'),'m-','o');
+
+% Rayleigh Plotting
+semilogy(P_db,BLER(20,'BPSK','Rayleigh'),'r-','x');
+semilogy(P_db,BLER(20,'QPSK','Rayleigh'),'g-','x');
+semilogy(P_db,BLER(20,'8-PSK','Rayleigh'),'b-','x');
+semilogy(P_db,BLER(20,'16-QAM','Rayleigh'),'m-','x');
+
+title('Signal Power vs. Throughput (Block length=10)');
+legend('BPSK-AWGN','QPSK-AWGN','8-PSK-AWGN','16-QAM-AWGN'...
+    ,'BPSK-Rayleigh','QPSK-Rayleigh','8-PSK-Rayleigh','16-QAM-Rayleigh');
+xlabel('Signal Power [dB]'); ylabel('Throughput [bps]');

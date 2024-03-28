@@ -1,5 +1,5 @@
 %% Demodul 함수 : 수신 신호 s 에 대해 Modulation type에 따른 symbol demodulation
-function [y,code]=Demodul(r, mod_type)
+function [y,code]=Demodul(r, mod_type, demod_type, channel_info)
 switch mod_type
     case {'BPSK', 'bpsk'}
         s=[1 ;-1];
@@ -22,10 +22,22 @@ switch mod_type
            0 1 0 1; 0 0 0 1; 0 0 0 0; 0 1 0 0;...
            1 1 0 1; 1 0 0 1; 1 0 0 0; 1 1 0 0];
 end
-dist=linspace(0,0,length(s));
-for k=1:length(s)
-    dist(k)=norm(r-s(k));
+
+switch demod_type
+    case 'Rayleigh_coherent'
+        dist=linspace(0,0,length(s));
+        r2=r*conj(channel_info)/abs(channel_info);
+        for k=1:length(s)
+            dist(k)=norm(r2-s(k));
+        end
+        [~,l]=min(dist);
+        y=s(l); code=c(l,:);
+    case {'Noncoherent',isempty(demod_type)==True}
+        dist=linspace(0,0,length(s));
+        for k=1:length(s)
+            dist(k)=norm(r-s(k));
+        end
+        [~,l]=min(dist);
+        y=s(l); code=c(l,:);
 end
-[~,l]=min(dist);
-y=s(l); code=c(l,:);
 end

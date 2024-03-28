@@ -1,5 +1,5 @@
 %% 각 파워당 BLER을 구하고, BLER 이용해 Throughput 정보 반환
-function Throughput=BLER(block_length, mod_type, channel_type)
+function Throughput=BLER(block_length, mod_type, channel_type, demod_type)
 % Parameters
 iter=10^5;
 P_db=0:2:20;
@@ -23,8 +23,8 @@ for l=1:length(P)
 for i=1:iter % Monte-Carlo simulation
     Block=Block_gen(mod_type,block_length);
     for j=1:block_length % Block 내의 각각 symbol에 대해
-        sym_temp=Transmit(Block(j,1),channel_type,P(l));
-        [y,y_code]=Demodul(sym_temp,mod_type);
+        [sym_temp,channel_info]=Transmit(Block(j,1),channel_type,P(l));
+        [y,y_code]=Demodul(sym_temp,mod_type,demod_type,channel_info);
         if Block(j,1)~=y
             BLE=BLE+1;
             break

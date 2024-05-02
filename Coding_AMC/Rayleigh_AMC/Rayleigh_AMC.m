@@ -20,9 +20,10 @@ for l=1:length(P)
     for i=1:iter % Monte-Carlo simulation
         % 전송 성공 여부
         T_success=true;
+
         % Obtaining SNR information
         channel_info=sqrt(1/2)*(randn()+1j*randn())*sqrt(P(l));
-        SNR=10*log10(norm(channel_info)^2);
+        SNR=10*log10(norm(channel_info)^2); % SNR in dB scale
 
         % Selecting Modulation Scheme with SNR information
         if SNR<6.5

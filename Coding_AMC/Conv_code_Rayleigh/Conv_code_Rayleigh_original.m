@@ -1,4 +1,5 @@
 close all; clear; clc;
+%% Rayleigh channel에서 각 modulation에서 Convolution code 적용시 Throughput 정보 얻기
 
 %% Parameter Setting
 iter=10^5;
@@ -15,7 +16,8 @@ for l=1:length(P) % for every Power levels
     T_bit=0; % 모든 시뮬레이션 후의 전송 성공한 비트의 개수
 
     for mod_case=1:5 % Modulation Scheme number
-
+        BLE=0; % 모든 시뮬레이션 후의 블록 에러 개수
+        T_bit=0; % 모든 시뮬레이션 후의 전송 성공한 비트의 개수
         %% Selecting Modulation Scheme & Setting Parameters
         if mod_case==1 % BPSK
             mod="BPSK";
@@ -69,10 +71,12 @@ for l=1:length(P) % for every Power levels
 
         for i=1:iter % Monte Carlo simulation
             Source=randi([0 1],1,10*mod_order); % Generate Source Bits
-            channel_info=sqrt(P(l)); % Channel information
+            channel_info=sqrt(P(l))*sqrt(1/2)*(randn()+1j*randn()); % Channel information
             R_succ=true; % 수신 성공 여부
             T_sig=zeros(1,20);
             R_sig=zeros(1,20);
+            D_symb=[];
+            
             % Convolutional encoding
             trellis=poly2trellis(7, [133 171]);
             Encoded=convenc(Source,trellis);
@@ -80,7 +84,7 @@ for l=1:length(P) % for every Power levels
             % Symbol mapping
             for j=1:20
                 for k=1:length(c(:,1))
-                    if c(k,:)==Encoded(mod_order*(j-1)+1:1+mod_order*j)
+                    if c(k,:)==Encoded(mod_order*(j-1)+1:mod_order*j)
                         index=k;
                         break
                     end
@@ -97,18 +101,26 @@ for l=1:length(P) % for every Power levels
             for j=1:20
                 dist=linspace(0,0,length(s));
                 for k=1:length(s)
-                    dist(k)=norm(R_sig(j)-channel_info*s(k));
+                    dist(k)=norm(R_sig(j)*conj(channel_info)/norm(channel_info)-norm(channel_info)*s(k));
                 end
                 [~,index]=min(dist);
                 D_symb=[D_symb c(index,:)];
             end
 
             % Block Decoding
-            Decoded=vitdec(D_symb,trellis,96,'trunc','hard',)
+            Decoded=vitdec(D_symb,trellis,10,'trunc','hard');
+
+            % Block Error Check
+            if isequaln(Decoded,Source)==false
+                R_succ=false;
+                BLE=BLE+1;
+            else
+                T_bit=T_bit+mod_order*10;
+            end
         end
         Block_error(mod_case,l)=BLE/iter;
         Throughput(mod_case,l)=T_bit/iter;
     end
 end
 
-save('Conv_code_awgn.mat','Throughput');
+save('Conv_code_rayleigh_original.mat','Throughput');

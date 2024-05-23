@@ -1,0 +1,15 @@
+close all; clear; clc;
+
+ZF_MIMO=load('ZR_MIMO_rate.mat').ergodic_rate;
+load('Ergodic_rate.mat','ergodic_rate');
+Beamforming_MIMO=ergodic_rate(3,:);
+
+
+plot(P_db,ergodic_rate(:),'g-'); hold on; grid on;
+plot(P_db,ergodic_rate(2,:),'b-');
+
+title('Ergodic Rate');
+%legend('AWGN-SISO','Rayleigh-SISO','Rayleigh-4x4MIMO');
+legend('Zero-Forcing 4x4MIMO')
+xlabel('Transmit SNR [dB]'); ylabel('Ergodic Rate [bps]');
+%}

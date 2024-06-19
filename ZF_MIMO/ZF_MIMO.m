@@ -13,9 +13,9 @@ for j=1:length(P)
     rate_sum=0;
     for i=1:iter
         H=sq*complex(randn(N),randn(N)); % channel generation
-        A=normalize(inv(H)); % normalizing column vector of inverse channel matrix
-        Z=A*H; % Zero-Forced channel
-        for k=1:length(Z(1,:))
+        A=normalize(inv(H),'norm'); % normalizing column vector of inverse channel matrix
+        Z=H*A; % Zero-Forced channel
+        for k=1:N
             rate_sum=rate_sum+log2(1+(norm(Z(k,k))^2)*P(j)/N);
         end
     end
@@ -23,9 +23,6 @@ for j=1:length(P)
 end
 
 plot(P_db,ergodic_rate(:),'g-'); hold on; grid on;
-%plot(P_db,ergodic_rate(2,:),'b-');
-%plot(P_db,ergodic_rate(3,:),'r-');
 title('Ergodic Rate');
-%legend('AWGN-SISO','Rayleigh-SISO','Rayleigh-4x4MIMO');
 legend('Zero-Forcing 4x4MIMO')
 xlabel('Transmit SNR [dB]'); ylabel('Ergodic Rate [bps]');
